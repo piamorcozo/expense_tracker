@@ -1,8 +1,8 @@
 <div class="modal-overlay" *ngIf="context" (click)="onOverlayClick($event)">
   <div class="modal">
     <div class="modal-title">
-      <iconify-icon [icon]="context?.editingItem ? 'ph:pencil-simple' : 'ph:plus-circle'" class="icon-primary"></iconify-icon>
-      {{ context?.editingItem ? 'Edit Expense' : 'Add Expense' }}
+      <iconify-icon [icon]="context.editingItem ? 'ph:pencil-simple' : 'ph:plus-circle'" class="icon-primary"></iconify-icon>
+      {{ context.editingItem ? 'Edit Expense' : 'Add Expense' }}
     </div>
 
     <div class="field">

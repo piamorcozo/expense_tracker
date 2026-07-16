@@ -1,5 +1,6 @@
 export const environment = {
   production: true,
-  // Replace with your deployed Flask API URL (Render/Railway, etc.)
-  apiUrl: 'https://your-backend.onrender.com/api'
+  // Set this to your Railway public domain + /api
+  // Example: 'https://expense-tracker-production-xxxx.up.railway.app/api'
+  apiUrl: 'https://expensetracker-production-5771.up.railway.app'
 };

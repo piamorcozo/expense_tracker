@@ -73,6 +73,10 @@ export class LoginComponent {
 
   private fail(err: any) {
     this.loading = false;
+    if (err?.status === 0) {
+      this.error = 'Cannot reach the server. Check that the API URL is set correctly.';
+      return;
+    }
     this.error = err?.error?.error || 'Something went wrong. Try again.';
   }
 }
