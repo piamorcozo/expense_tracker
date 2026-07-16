@@ -1,0 +1,51 @@
+<div class="section-title">Maintenance</div>
+<div class="section-desc">Set these up once — they'll auto-fill every new cutoff list.</div>
+
+<div class="maint-group">
+  <h3 style="font-size:14px; margin-bottom:10px; display:flex; align-items:center; gap:8px;">
+    <iconify-icon icon="ph:arrows-clockwise" class="icon-primary"></iconify-icon> Must-haves (auto-added each cutoff)
+  </h3>
+  <div>
+    <span class="maint-tag" *ngFor="let m of mustHaves">
+      {{ m.name }} · {{ fmt(m.amount) }}
+      <button type="button" (click)="removeMustHave(m)"><iconify-icon icon="ph:x" class="ic-sm"></iconify-icon></button>
+    </span>
+  </div>
+  <div class="add-inline">
+    <input type="text" [(ngModel)]="newMustHave" placeholder="e.g. Rent, Electricity" (keyup.enter)="addMustHave()">
+    <input type="number" class="amount-input" [(ngModel)]="newMustHaveAmount" placeholder="Amount" (keyup.enter)="addMustHave()">
+    <button (click)="addMustHave()">Add</button>
+  </div>
+</div>
+
+<div class="maint-group">
+  <h3 style="font-size:14px; margin-bottom:10px; display:flex; align-items:center; gap:8px;">
+    <iconify-icon icon="ph:bank" class="icon-primary"></iconify-icon> Banks
+  </h3>
+  <div>
+    <span class="maint-tag" *ngFor="let b of banks">
+      {{ b.name }}
+      <button type="button" (click)="removeBank(b)"><iconify-icon icon="ph:x" class="ic-sm"></iconify-icon></button>
+    </span>
+  </div>
+  <div class="add-inline">
+    <input type="text" [(ngModel)]="newBank" placeholder="e.g. BPI, GCash, Maya" (keyup.enter)="addBank()">
+    <button (click)="addBank()">Add</button>
+  </div>
+</div>
+
+<div class="maint-group">
+  <h3 style="font-size:14px; margin-bottom:10px; display:flex; align-items:center; gap:8px;">
+    <iconify-icon icon="ph:tag" class="icon-primary"></iconify-icon> Status options
+  </h3>
+  <div>
+    <span class="maint-tag" *ngFor="let s of itemStatuses">
+      {{ s.name }}
+      <button type="button" (click)="removeItemStatus(s)"><iconify-icon icon="ph:x" class="ic-sm"></iconify-icon></button>
+    </span>
+  </div>
+  <div class="add-inline">
+    <input type="text" [(ngModel)]="newItemStatus" placeholder="e.g. Pending, Paid, Skipped" (keyup.enter)="addItemStatus()">
+    <button (click)="addItemStatus()">Add</button>
+  </div>
+</div>

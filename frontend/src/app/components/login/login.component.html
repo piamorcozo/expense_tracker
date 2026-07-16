@@ -1,0 +1,39 @@
+<div class="login-page">
+  <button class="login-theme" (click)="themeService.toggle()" type="button" aria-label="Toggle theme">
+    <iconify-icon [icon]="themeService.current === 'light' ? 'ph:moon' : 'ph:sun'"></iconify-icon>
+  </button>
+
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="brand-mark"><img src="assets/cutoff-logo.png" alt="Cutoff" /></div>
+      <div class="brand-name">Cutoff</div>
+      <div class="brand-sub">your money, your rules</div>
+    </div>
+
+    <h1 class="login-title">{{ mode === 'login' ? 'Welcome back' : 'Create account' }}</h1>
+    <p class="login-desc">{{ mode === 'login' ? 'Sign in to continue.' : 'Set up your personal tracker.' }}</p>
+
+    <div class="field">
+      <label>Username</label>
+      <input type="text" [(ngModel)]="username" autocomplete="username" (keyup.enter)="submit()">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" [(ngModel)]="password" autocomplete="current-password" (keyup.enter)="submit()">
+    </div>
+    <div class="field" *ngIf="mode === 'register'">
+      <label>Confirm password</label>
+      <input type="password" [(ngModel)]="confirmPassword" autocomplete="new-password" (keyup.enter)="submit()">
+    </div>
+
+    <div class="login-error" *ngIf="error">{{ error }}</div>
+
+    <button class="btn-primary login-submit" (click)="submit()" [disabled]="loading">
+      {{ loading ? 'Please wait…' : (mode === 'login' ? 'Sign in' : 'Create account') }}
+    </button>
+
+    <button class="login-switch" type="button" (click)="toggleMode()">
+      {{ mode === 'login' ? 'Need an account? Create one' : 'Already have an account? Sign in' }}
+    </button>
+  </div>
+</div>

@@ -1,0 +1,13 @@
+<div class="modal-overlay" *ngIf="context" (click)="onOverlayClick($event)">
+  <div class="modal confirm-modal">
+    <div class="modal-title">
+      <iconify-icon icon="ph:warning-circle" class="icon-coral"></iconify-icon>
+      {{ context.title }}
+    </div>
+    <p class="confirm-message">{{ context.message }}</p>
+    <div class="modal-actions">
+      <button class="btn-secondary" (click)="cancel()">{{ context.cancelLabel }}</button>
+      <button class="btn-primary confirm-danger" (click)="confirm()">{{ context.confirmLabel }}</button>
+    </div>
+  </div>
+</div>

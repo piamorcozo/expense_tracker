@@ -1,0 +1,42 @@
+<div class="modal-overlay" *ngIf="open" (click)="onOverlayClick($event)">
+  <div class="modal">
+    <div class="modal-title">
+      <iconify-icon icon="ph:users-three" class="icon-primary"></iconify-icon>
+      {{ step === 'list' ? 'Switch account' : 'Enter password' }}
+    </div>
+
+    <ng-container *ngIf="step === 'list'">
+      <p class="switch-desc">Choose another account, or sign out completely.</p>
+
+      <div *ngIf="otherUsers.length === 0" class="empty-state" style="padding:20px 0">
+        <div>No other accounts yet.</div>
+      </div>
+
+      <button class="account-row" type="button" *ngFor="let u of otherUsers" (click)="pickUser(u)">
+        <span class="account-emoji">{{ u.emoji }}</span>
+        <span class="account-name">{{ u.name }}</span>
+        <iconify-icon icon="ph:caret-right" class="ic-sm"></iconify-icon>
+      </button>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" (click)="close()">Cancel</button>
+        <button class="btn-primary signout" (click)="signOut()">Sign out</button>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="step === 'password' && selected">
+      <p class="switch-desc">Enter the password for <strong>{{ selected.name }}</strong>.</p>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" [(ngModel)]="password" autocomplete="current-password" (keyup.enter)="confirmSwitch()">
+      </div>
+      <div class="login-error" *ngIf="error">{{ error }}</div>
+      <div class="modal-actions">
+        <button class="btn-secondary" (click)="backToList()">Back</button>
+        <button class="btn-primary" (click)="confirmSwitch()" [disabled]="loading">
+          {{ loading ? 'Checking…' : 'Switch' }}
+        </button>
+      </div>
+    </ng-container>
+  </div>
+</div>

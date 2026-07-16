@@ -1,0 +1,36 @@
+<div class="modal-overlay" *ngIf="open" (click)="onOverlayClick($event)">
+  <div class="modal">
+    <div class="modal-title"><iconify-icon icon="ph:piggy-bank" class="icon-primary"></iconify-icon> Add savings</div>
+
+    <div class="field">
+      <label>Amount deposited</label>
+      <input type="number" [(ngModel)]="amount" placeholder="0.00">
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Date deposited</label>
+        <input type="date" [(ngModel)]="date">
+      </div>
+      <div class="field">
+        <label>Bank</label>
+        <select [(ngModel)]="bank">
+          <option *ngFor="let b of banks" [value]="b.name">{{ b.name }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Status</label>
+      <select [(ngModel)]="status">
+        <option>Deposited</option>
+        <option>Pending</option>
+      </select>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-secondary" (click)="close()">Cancel</button>
+      <button class="btn-primary" (click)="save()">Save deposit</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,21 @@
+<div class="section-title">History</div>
+<div class="section-desc">Closed lists — open one to change its status and reopen if needed.</div>
+
+<div class="filter-bar">
+  <div class="filter-chip active">All time</div>
+  <div class="filter-chip">2026</div>
+  <div class="filter-chip">2025</div>
+  <div class="filter-chip">Custom range</div>
+</div>
+
+<div *ngIf="closedLists.length === 0" class="empty-state">
+  <iconify-icon icon="ph:tray" class="emoji icon-muted"></iconify-icon>
+  <div>No closed lists yet.</div>
+</div>
+<div class="pending-row" *ngFor="let l of closedLists" (click)="viewList(l.id)">
+  <div>
+    <div class="pending-title">{{ l.name }}</div>
+    <div class="pending-sub">{{ l.type === 'cutoff' ? (l.month + ' ' + l.day + ' · Budget ' + fmt(l.budget)) : 'Other expense' }}</div>
+  </div>
+  <div class="item-amt">{{ fmt(l.spent) }}</div>
+</div>

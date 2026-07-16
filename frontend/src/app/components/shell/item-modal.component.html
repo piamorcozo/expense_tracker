@@ -1,0 +1,49 @@
+<div class="modal-overlay" *ngIf="context" (click)="onOverlayClick($event)">
+  <div class="modal">
+    <div class="modal-title">
+      <iconify-icon [icon]="context?.editingItem ? 'ph:pencil-simple' : 'ph:plus-circle'" class="icon-primary"></iconify-icon>
+      {{ context?.editingItem ? 'Edit Expense' : 'Add Expense' }}
+    </div>
+
+    <div class="field">
+      <label>Item / Expense name</label>
+      <input type="text" [(ngModel)]="name" placeholder="e.g. Electricity bill">
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Amount</label>
+        <input type="number" [(ngModel)]="amount" placeholder="0.00">
+      </div>
+      <div class="field">
+        <label>Bank</label>
+        <select [(ngModel)]="bank">
+          <option *ngFor="let b of banks" [value]="b.name">{{ b.name }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Status</label>
+        <select [(ngModel)]="status">
+          <option *ngFor="let s of statuses" [value]="s.name">{{ s.name }}</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Due date (optional)</label>
+        <input type="date" [(ngModel)]="dueDate">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Remarks (optional)</label>
+      <input type="text" [(ngModel)]="remarks" placeholder="Any notes...">
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-secondary" (click)="close()">Cancel</button>
+      <button class="btn-primary" (click)="save()">Save item</button>
+    </div>
+  </div>
+</div>

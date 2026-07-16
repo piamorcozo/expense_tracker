@@ -1,0 +1,18 @@
+.success-modal {
+  max-width: 360px;
+  text-align: center;
+}
+
+.success-icon-wrap {
+  margin-bottom: 8px;
+}
+
+.success-icon {
+  font-size: 42px;
+  color: var(--mint);
+}
+
+.success-title {
+  margin-bottom: 8px;
+  font-size: 16px;
+}

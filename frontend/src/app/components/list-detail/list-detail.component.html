@@ -1,0 +1,95 @@
+<ng-container *ngIf="list">
+  <div class="list-detail-header">
+    <div class="ldh-top">
+      <div class="ldh-title-block">
+        <ng-container *ngIf="!editingName; else nameEdit">
+          <div class="ldh-name-row">
+            <div class="ldh-name">{{ list.name }}</div>
+            <button type="button" class="icon-btn edit-name-btn" (click)="startEditName()" title="Edit name"
+                    *ngIf="list.status !== 'Closed'">
+              <iconify-icon icon="ph:pencil-simple" class="ic-sm"></iconify-icon>
+            </button>
+          </div>
+        </ng-container>
+        <ng-template #nameEdit>
+          <div class="ldh-name-edit">
+            <input type="text" [(ngModel)]="nameDraft" (keyup.enter)="saveName()" (keyup.escape)="cancelEditName()" autofocus>
+            <button type="button" class="icon-btn" (click)="saveName()" title="Save">
+              <iconify-icon icon="ph:check" class="ic-sm"></iconify-icon>
+            </button>
+            <button type="button" class="icon-btn" (click)="cancelEditName()" title="Cancel">
+              <iconify-icon icon="ph:x" class="ic-sm"></iconify-icon>
+            </button>
+          </div>
+        </ng-template>
+        <div class="ldh-meta">{{ metaLine }}</div>
+      </div>
+      <select class="status-select" [ngClass]="statusClass(list.status)"
+              [ngModel]="list.status" (ngModelChange)="setStatus($event)">
+        <option value="Open">Open</option>
+        <option value="Pending">Pending</option>
+        <option value="Closed">Closed</option>
+      </select>
+    </div>
+
+    <ng-container *ngIf="list.budget">
+      <div class="ldh-remaining-label">Remaining budget</div>
+      <div class="ldh-remaining" [class.coral]="list.remaining < 0" [class.mint]="list.remaining >= 0">
+        {{ fmt(list.remaining) }}
+      </div>
+    </ng-container>
+
+    <div class="pending-sum-card" *ngIf="list.type === 'other'">
+      <div class="pending-sum-label">Pending for payment</div>
+      <div class="pending-sum-amt">{{ fmt(pendingTotal) }}</div>
+      <div class="pending-sum-note" *ngIf="pendingCount">{{ pendingCount }} item{{ pendingCount === 1 ? '' : 's' }} still unpaid</div>
+      <div class="pending-sum-note" *ngIf="!pendingCount">All items are paid</div>
+    </div>
+
+    <div class="ldh-note" *ngIf="list.status === 'Closed'">
+      This list is closed. Change the status above to reopen it for editing.
+    </div>
+    <div class="ldh-actions" *ngIf="list.status !== 'Closed'">
+      <button class="ldh-btn add" (click)="addExpense()"><iconify-icon icon="ph:plus-bold" class="ic-sm"></iconify-icon> Add expense</button>
+      <button class="ldh-btn paid" (click)="markAllPaid()" *ngIf="list.items?.length">
+        <iconify-icon icon="ph:checks" class="ic-sm"></iconify-icon> Paid
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="!list.items?.length" class="empty-state">
+    <iconify-icon icon="ph:basket" class="emoji icon-muted"></iconify-icon>
+    <div>No items yet.</div>
+  </div>
+
+  <div class="swipe-wrap" *ngFor="let it of list.items">
+    <div class="swipe-action" *ngIf="list.status !== 'Closed'" (click)="deleteItem(it); $event.stopPropagation()">
+      <iconify-icon icon="ph:trash" class="ic-sm"></iconify-icon>
+    </div>
+    <div class="item-row"
+         appSwipeToDelete #swipe="swipeToDelete" [appSwipeToDeleteDisabled]="list.status === 'Closed'"
+         [class.item-row-clickable]="list.status !== 'Closed'"
+         (click)="swipe.isOpen ? swipe.close() : (list.status !== 'Closed' && editItem(it))">
+      <div class="item-left">
+        <div class="item-emoji"><iconify-icon [icon]="iconFor(it.name)" class="icon-primary"></iconify-icon></div>
+        <div>
+          <div class="item-name">{{ it.name }}</div>
+          <div class="item-meta">{{ it.bank }}{{ it.remarks ? ' · ' + it.remarks : '' }}</div>
+          <div class="item-due" *ngIf="list.type === 'other' && it.due_date">Due {{ formatDate(it.due_date) }}</div>
+        </div>
+      </div>
+      <div class="item-right">
+        <div class="item-amt">{{ fmt(it.amount) }}</div>
+        <span class="status-badge" [ngClass]="it.status === 'Paid' ? 'status-open' : 'status-pending'">{{ it.status }}</span>
+        <div class="item-actions" *ngIf="list.status !== 'Closed'">
+          <button class="icon-btn edit-btn" (click)="editItem(it); $event.stopPropagation()">
+            <iconify-icon icon="ph:pencil-simple" class="ic-sm"></iconify-icon>
+          </button>
+          <button class="icon-btn delete-btn" (click)="deleteItem(it); $event.stopPropagation()">
+            <iconify-icon icon="ph:trash" class="ic-sm"></iconify-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>

@@ -1,0 +1,51 @@
+<div class="section-title">Savings</div>
+<div class="section-desc">Every cutoff you tuck away — watch it grow.</div>
+
+<div class="predictive-card savings-hero" *ngIf="summary">
+  <iconify-icon icon="ph:bank" class="predictive-bg-icon"></iconify-icon>
+  <div class="predictive-label">Total Savings</div>
+  <div class="predictive-amt">{{ fmt(summary.total || 0) }}</div>
+</div>
+
+<div class="stat-row" *ngIf="summary">
+  <div class="stat-card">
+    <iconify-icon icon="ph:plant" class="stat-icon icon-primary"></iconify-icon>
+    <div class="stat-label">Projected by Dec 30, {{ currentYear }}</div>
+    <div class="stat-value primaryc">{{ fmt(summary.projected_year_end) }}</div>
+    <div class="stat-note">
+      {{ summary.most_frequent_amount
+        ? 'Based on your usual ' + fmt(summary.most_frequent_amount) + ' per cutoff, with ' + summary.remaining_cutoffs + ' cutoffs left.'
+        : 'Add a few deposits so I can start predicting your year-end total.' }}
+    </div>
+  </div>
+</div>
+
+<div class="row-between"><h3>Deposit history</h3></div>
+
+<div *ngIf="entries.length === 0" class="empty-state">
+  <iconify-icon icon="ph:piggy-bank" class="emoji icon-muted"></iconify-icon>
+  <div>No deposits logged yet — tap + to add one.</div>
+</div>
+<div class="swipe-wrap" *ngFor="let r of entries">
+  <div class="swipe-action" (click)="deleteEntry(r)">
+    <iconify-icon icon="ph:trash" class="ic-sm"></iconify-icon>
+  </div>
+  <div class="item-row" appSwipeToDelete #swipe="swipeToDelete" (click)="swipe.isOpen && swipe.close()">
+    <div class="item-left">
+      <div class="item-emoji"><iconify-icon icon="ph:piggy-bank" class="icon-primary"></iconify-icon></div>
+      <div>
+        <div class="item-name">{{ formatDate(r.date) }}</div>
+        <div class="item-meta">{{ r.bank }}</div>
+      </div>
+    </div>
+    <div class="item-right">
+      <div class="item-amt">{{ fmt(r.amount) }}</div>
+      <span class="status-badge" [ngClass]="r.status === 'Deposited' ? 'status-open' : 'status-pending'">{{ r.status }}</span>
+      <div class="item-actions">
+        <button class="icon-btn delete-btn" (click)="deleteEntry(r); $event.stopPropagation()" title="Delete deposit">
+          <iconify-icon icon="ph:trash" class="ic-sm"></iconify-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

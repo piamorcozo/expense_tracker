@@ -1,0 +1,14 @@
+.confirm-modal {
+  max-width: 400px;
+}
+
+.confirm-message {
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.45;
+  margin: 0 0 4px;
+}
+
+.confirm-danger {
+  background: var(--coral) !important;
+}

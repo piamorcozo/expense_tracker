@@ -1,0 +1,91 @@
+<div class="hero-card" *ngIf="openCutoff">
+  <div class="hero-top">
+    <div>
+      <div class="hero-label">Remaining budget</div>
+      <div class="hero-amount">{{ fmt(openCutoff.remaining) }}</div>
+    </div>
+    <button class="cutoff-pill" (click)="goToList(openCutoff.id)">{{ openCutoff.month }} {{ openCutoff.day }} · {{ openCutoff.status }}</button>
+  </div>
+  <div class="hero-jar">
+    <svg class="jar-ring" viewBox="0 0 52 52">
+      <circle cx="26" cy="26" r="22" stroke="rgba(255,255,255,0.25)" stroke-width="6" fill="none"/>
+      <circle cx="26" cy="26" r="22" stroke="white" stroke-width="6" fill="none"
+        stroke-linecap="round" [attr.stroke-dasharray]="138"
+        [attr.stroke-dashoffset]="138 - (138 * pct/100)" transform="rotate(-90 26 26)"/>
+    </svg>
+    <div class="hero-jar-text">
+      You've used <b>{{ pct }}%</b> of your {{ fmt(openCutoff.budget) }} budget for this cutoff.
+      {{ pct < 80 ? "Nice pace!" : "Getting close — watch it!" }}
+    </div>
+  </div>
+</div>
+
+<div class="stat-row" *ngIf="openCutoff">
+  <div class="stat-card">
+    <iconify-icon icon="ph:trend-down" class="stat-icon icon-coral"></iconify-icon>
+    <div class="stat-label">Total Expenses</div>
+    <div class="stat-value coral">{{ fmt(openCutoff.spent) }}</div>
+  </div>
+  <div class="stat-card">
+    <iconify-icon icon="ph:plant" class="stat-icon icon-mint"></iconify-icon>
+    <div class="stat-label">Remaining</div>
+    <div class="stat-value mint">{{ fmt(openCutoff.remaining) }}</div>
+  </div>
+</div>
+
+<div class="twoup" *ngIf="openCutoff || openOthers.length">
+  <div class="list-card" *ngIf="openCutoff" (click)="goToList(openCutoff.id)">
+    <button class="list-card-add" (click)="quickAdd($event, openCutoff.id)"><iconify-icon icon="ph:plus-bold" class="ic-sm"></iconify-icon></button>
+    <div class="list-card-icon" style="background:var(--primary-light);">
+      <iconify-icon [icon]="iconFor(openCutoff)" class="icon-primary"></iconify-icon>
+    </div>
+    <div class="list-card-title">{{ openCutoff.name }}</div>
+    <div class="list-card-meta">{{ openCutoff.item_count ?? 0 }} items · {{ openCutoff.status }}</div>
+  </div>
+  <div class="list-card" *ngFor="let o of openOthers" (click)="goToList(o.id)">
+    <button class="list-card-add" (click)="quickAdd($event, o.id)"><iconify-icon icon="ph:plus-bold" class="ic-sm"></iconify-icon></button>
+    <div class="list-card-icon" style="background:var(--coral-light);">
+      <iconify-icon [icon]="iconFor(o)" style="color:#C9603F"></iconify-icon>
+    </div>
+    <div class="list-card-title">{{ o.name }}</div>
+    <div class="list-card-meta">{{ o.item_count ?? 0 }} items · {{ o.status }}</div>
+  </div>
+</div>
+
+<div class="row-between"><h3>Pending lists</h3></div>
+
+<div class="filter-bar">
+  <button type="button" class="filter-chip" [class.active]="pendingFilter === 'all'" (click)="setPendingFilter('all')">All</button>
+  <button type="button" class="filter-chip" [class.active]="pendingFilter === 'month'" (click)="setPendingFilter('month')">This month</button>
+  <button type="button" class="filter-chip" [class.active]="pendingFilter === 'quarter'" (click)="setPendingFilter('quarter')">Last 3 months</button>
+  <button type="button" class="filter-chip" [class.active]="pendingFilter === 'custom'" (click)="setPendingFilter('custom')">Custom range</button>
+</div>
+
+<div class="custom-range" *ngIf="pendingFilter === 'custom'">
+  <div class="field">
+    <label>From</label>
+    <input type="date" [(ngModel)]="customFrom" (ngModelChange)="onCustomRangeChange()">
+  </div>
+  <div class="field">
+    <label>To</label>
+    <input type="date" [(ngModel)]="customTo" (ngModelChange)="onCustomRangeChange()">
+  </div>
+</div>
+
+<div *ngIf="pendingLists.length === 0" class="empty-state">
+  <iconify-icon icon="ph:confetti" class="emoji icon-muted"></iconify-icon>
+  <div>Nothing pending — you're all caught up!</div>
+</div>
+<div class="pending-row" *ngFor="let l of pendingLists" (click)="goToList(l.id)">
+  <div class="pending-left">
+    <div class="pending-icon"><iconify-icon [icon]="iconFor(l)" class="icon-primary"></iconify-icon></div>
+    <div>
+      <div class="pending-title">{{ l.name }}</div>
+      <div class="pending-sub">{{ l.type === 'cutoff' ? (l.month + ' ' + l.day) : 'Other expense' }} · {{ l.item_count ?? 0 }} items</div>
+    </div>
+  </div>
+  <div class="pending-right">
+    <button class="mini-add" (click)="quickAdd($event, l.id)"><iconify-icon icon="ph:plus-bold" class="ic-sm"></iconify-icon></button>
+    <iconify-icon icon="ph:caret-right" class="chev-mini"></iconify-icon>
+  </div>
+</div>

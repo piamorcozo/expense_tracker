@@ -1,0 +1,82 @@
+<ng-container *ngIf="isLoginPage; else appShell">
+  <router-outlet></router-outlet>
+  <app-switch-account-modal></app-switch-account-modal>
+</ng-container>
+
+<ng-template #appShell>
+<div class="app-shell">
+  <nav class="sidebar">
+    <div class="brand">
+      <div class="brand-mark"><img src="assets/cutoff-logo.png" alt="Cutoff" /></div>
+      <div>
+        <div class="brand-name">Expense Tracker</div>
+      </div>
+    </div>
+    <button class="navitem" routerLink="/dashboard" routerLinkActive="active">
+      <iconify-icon icon="ph:house"></iconify-icon> Dashboard
+    </button>
+    <button class="navitem" routerLink="/savings" routerLinkActive="active">
+      <iconify-icon icon="ph:coins"></iconify-icon> Savings
+    </button>
+    <button class="navitem" routerLink="/maintenance" routerLinkActive="active">
+      <iconify-icon icon="ph:wrench"></iconify-icon> Maintenance
+    </button>
+    <button class="navitem" routerLink="/history" routerLinkActive="active">
+      <iconify-icon icon="ph:archive"></iconify-icon> History
+    </button>
+  </nav>
+
+  
+  <div class="main-col">
+    <div class="topbar" *ngIf="!isListDetail">
+      <div class="brand">
+        <div class="brand-mark"><img src="assets/cutoff-logo.png" alt="Cutoff" /></div>
+        <div>
+          <div class="brand-name">Hi, {{ currentUserName }}!</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <button class="theme-toggle" (click)="themeService.toggle()" type="button" aria-label="Toggle theme">
+          <iconify-icon [icon]="themeService.current === 'light' ? 'ph:moon' : 'ph:sun'"></iconify-icon>
+        </button>
+        <button class="theme-toggle" (click)="openSwitchAccount()" type="button" aria-label="Logout / switch account">
+          <iconify-icon icon="ph:sign-out"></iconify-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="back-row" *ngIf="isListDetail">
+      <button class="back-btn" (click)="goBack()"><iconify-icon icon="ph:arrow-left"></iconify-icon></button>
+      <div style="font-weight:600; font-size:15px;">Back</div>
+    </div>
+
+    <main>
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>
+
+<div class="bottomnav">
+  <button class="navbtn" routerLink="/dashboard" routerLinkActive="active">
+    <iconify-icon class="ic" icon="ph:house"></iconify-icon>Home
+  </button>
+  <button class="navbtn" routerLink="/savings" routerLinkActive="active">
+    <iconify-icon class="ic" icon="ph:coins"></iconify-icon>Savings
+  </button>
+  <button class="navbtn" routerLink="/maintenance" routerLinkActive="active">
+    <iconify-icon class="ic" icon="ph:wrench"></iconify-icon>Setup
+  </button>
+  <button class="navbtn" routerLink="/history" routerLinkActive="active">
+    <iconify-icon class="ic" icon="ph:archive"></iconify-icon>History
+  </button>
+</div>
+
+<button class="fab" *ngIf="showFab" (click)="onFabClick()"><iconify-icon icon="ph:plus-bold" class="ic-lg icon-white"></iconify-icon></button>
+
+<app-new-list-modal></app-new-list-modal>
+<app-item-modal></app-item-modal>
+<app-savings-modal></app-savings-modal>
+<app-switch-account-modal></app-switch-account-modal>
+<app-confirm-modal></app-confirm-modal>
+<app-success-modal></app-success-modal>
+</ng-template>

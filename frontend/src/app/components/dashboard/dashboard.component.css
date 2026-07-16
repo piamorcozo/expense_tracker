@@ -1,0 +1,3 @@
+/* Hero card, stat cards, list cards, pending rows, etc. are all shared
+   in src/styles.css so Dashboard/List-detail/History/Savings stay visually consistent.
+   Nothing dashboard-specific yet. */

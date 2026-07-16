@@ -1,0 +1,61 @@
+<div class="modal-overlay" *ngIf="open" (click)="onOverlayClick($event)">
+  <div class="modal">
+    <div class="modal-title"><iconify-icon icon="ph:sparkle" class="icon-primary"></iconify-icon> New list</div>
+
+    <div class="field">
+      <label>Type</label>
+      <div class="type-toggle">
+        <button type="button" class="type-btn" [class.active]="type === 'cutoff'" (click)="setType('cutoff')">
+          <iconify-icon icon="ph:calendar-blank"></iconify-icon> Cutoff-based
+        </button>
+        <button type="button" class="type-btn" [class.active]="type === 'other'" (click)="setType('other')">
+          <iconify-icon icon="ph:shopping-bag"></iconify-icon> Other expense
+        </button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Name</label>
+      <input type="text" [(ngModel)]="name" placeholder="e.g. June 30 Cutoff, Car Insurance">
+    </div>
+
+    <div class="field">
+      <label>Icon</label>
+      <div class="icon-carousel" role="listbox" aria-label="List icon">
+        <button type="button" class="icon-pick" *ngFor="let opt of iconOptions"
+                [class.active]="icon === opt.icon"
+                [attr.title]="opt.label"
+                [attr.aria-label]="opt.label"
+                (click)="icon = opt.icon">
+          <iconify-icon [icon]="opt.icon"></iconify-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="field-row" *ngIf="type === 'cutoff'">
+      <div class="field">
+        <label>Month</label>
+        <select [(ngModel)]="month">
+          <option *ngFor="let m of months">{{ m }}</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Cutoff day</label>
+        <select [(ngModel)]="day">
+          <option value="15">15</option>
+          <option value="30">30</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>{{ type === 'cutoff' ? 'Budget amount' : 'Budget amount (optional)' }}</label>
+      <input type="number" [(ngModel)]="budget" placeholder="0.00">
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-secondary" (click)="close()">Cancel</button>
+      <button class="btn-primary" (click)="save()">Create list</button>
+    </div>
+  </div>
+</div>
