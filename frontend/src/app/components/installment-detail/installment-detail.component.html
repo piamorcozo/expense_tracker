@@ -31,13 +31,10 @@
       </div>
     </div>
 
-    <div class="ldh-actions" *ngIf="plan.pending_count > 0" style="flex-wrap:wrap">
-      <div class="advance-row">
-        <input type="number" class="advance-input" [(ngModel)]="advanceCount" min="1" [max]="plan.pending_count">
-        <button class="ldh-btn paid" (click)="payAdvance()">
-          <iconify-icon icon="ph:lightning" class="ic-sm"></iconify-icon> Pay advance
-        </button>
-      </div>
+    <div class="ldh-actions" *ngIf="plan.pending_count > 0">
+      <button class="ldh-btn paid" (click)="openAdvanceModal()">
+        <iconify-icon icon="ph:lightning" class="ic-sm"></iconify-icon> Pay advance
+      </button>
       <button class="ldh-btn add" (click)="earlyPayoff()">
         <iconify-icon icon="ph:checks" class="ic-sm"></iconify-icon> Early payoff
       </button>
@@ -47,8 +44,9 @@
 
   <div class="row-between"><h3>Payment schedule</h3></div>
 
-  <div class="item-row pay-row" *ngFor="let pay of plan.payments"
-       [class.pay-paid]="pay.status === 'Paid'">
+  <div class="item-row pay-row item-row-clickable" *ngFor="let pay of sortedPayments"
+       [class.pay-paid]="pay.status === 'Paid'"
+       (click)="onPaymentClick(pay)">
     <div class="item-left">
       <div class="item-emoji">
         <iconify-icon [icon]="pay.status === 'Paid' ? 'ph:check-circle-fill' : 'ph:circle'"
@@ -65,11 +63,39 @@
     </div>
     <div class="item-right">
       <div class="item-amt">{{ fmt(pay.amount) }}</div>
-      <button type="button" class="status-badge"
-              [ngClass]="pay.status === 'Paid' ? 'status-open' : 'status-pending'"
-              (click)="togglePaid(pay)">
-        {{ pay.status }}
-      </button>
+      <span class="status-badge" [ngClass]="pay.status === 'Paid' ? 'status-open' : 'status-pending'">{{ pay.status }}</span>
     </div>
   </div>
 </ng-container>
+
+<!-- Pay advance: ask how many -->
+<div class="modal-overlay" *ngIf="advanceOpen" (click)="onAdvanceOverlay($event)">
+  <div class="modal advance-modal">
+    <div class="modal-title">
+      <iconify-icon icon="ph:lightning" class="icon-primary"></iconify-icon>
+      Pay advance
+    </div>
+    <p class="advance-desc">How many upcoming installments do you want to pay now?</p>
+
+    <div class="advance-stepper">
+      <button type="button" class="stepper-btn" (click)="decAdvance()" [disabled]="advanceCount <= 1" aria-label="Decrease">
+        <iconify-icon icon="ph:minus-bold"></iconify-icon>
+      </button>
+      <div class="stepper-count">{{ advanceCount }}</div>
+      <button type="button" class="stepper-btn" (click)="incAdvance()" [disabled]="!plan || advanceCount >= plan.pending_count" aria-label="Increase">
+        <iconify-icon icon="ph:plus-bold"></iconify-icon>
+      </button>
+    </div>
+
+    <div class="advance-amount" *ngIf="plan">
+      <div class="advance-amount-label">Total to pay</div>
+      <div class="advance-amount-value">{{ fmt(advanceTotal) }}</div>
+      <div class="advance-amount-note">{{ advanceCount }} × {{ fmt(plan.amount) }}</div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-secondary" (click)="closeAdvanceModal()">No</button>
+      <button class="btn-primary" (click)="confirmAdvance()">Yes, pay</button>
+    </div>
+  </div>
+</div>

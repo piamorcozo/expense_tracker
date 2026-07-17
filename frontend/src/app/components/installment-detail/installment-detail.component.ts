@@ -17,6 +17,7 @@ import { InstallmentPlan, InstallmentPayment } from '../../core/models/models';
 })
 export class InstallmentDetailComponent implements OnInit, OnDestroy {
   plan: InstallmentPlan | null = null;
+  advanceOpen = false;
   advanceCount = 1;
   private planId!: number;
   private subs = new Subscription();
@@ -44,28 +45,79 @@ export class InstallmentDetailComponent implements OnInit, OnDestroy {
     });
   }
 
+  /** Unpaid first (by schedule #), paid sink to the bottom. */
+  get sortedPayments(): InstallmentPayment[] {
+    const payments = this.plan?.payments || [];
+    return [...payments].sort((a, b) => {
+      if (a.status !== b.status) return a.status === 'Pending' ? -1 : 1;
+      return a.installment_number - b.installment_number;
+    });
+  }
+
   freqLabel(f: string): string {
     if (f === 'weekly') return 'Weekly';
     if (f === 'monthly') return 'Monthly';
     return 'Bi-weekly';
   }
 
-  togglePaid(pay: InstallmentPayment) {
-    const next = pay.status === 'Paid' ? 'Pending' : 'Paid';
-    this.api.setInstallmentPaymentStatus(pay.id, next).subscribe(plan => this.plan = plan);
+  onPaymentClick(pay: InstallmentPayment) {
+    if (pay.status === 'Pending') {
+      this.modalService.confirm(
+        `Pay installment #${pay.installment_number} for ${this.fmt(pay.amount)}?`,
+        { title: 'Confirm payment', confirmLabel: 'Yes', cancelLabel: 'No' }
+      ).subscribe(ok => {
+        if (ok) this.api.setInstallmentPaymentStatus(pay.id, 'Paid').subscribe(plan => this.plan = plan);
+      });
+    } else {
+      this.modalService.confirm(
+        `Mark installment #${pay.installment_number} as pending again?`,
+        { title: 'Undo payment', confirmLabel: 'Yes', cancelLabel: 'No' }
+      ).subscribe(ok => {
+        if (ok) this.api.setInstallmentPaymentStatus(pay.id, 'Pending').subscribe(plan => this.plan = plan);
+      });
+    }
   }
 
-  payAdvance() {
+  get advanceTotal(): number {
+    if (!this.plan) return 0;
+    return (Number(this.plan.amount) || 0) * (Number(this.advanceCount) || 0);
+  }
+
+  openAdvanceModal() {
+    if (!this.plan?.pending_count) return;
+    this.advanceCount = 1;
+    this.advanceOpen = true;
+  }
+
+  closeAdvanceModal() { this.advanceOpen = false; }
+
+  onAdvanceOverlay(e: MouseEvent) {
+    if ((e.target as HTMLElement).classList.contains('modal-overlay')) this.closeAdvanceModal();
+  }
+
+  decAdvance() {
+    this.advanceCount = Math.max(1, (Number(this.advanceCount) || 1) - 1);
+  }
+
+  incAdvance() {
+    const max = this.plan?.pending_count || 1;
+    this.advanceCount = Math.min(max, (Number(this.advanceCount) || 1) + 1);
+  }
+
+  confirmAdvance() {
     if (!this.plan || !this.plan.pending_count) return;
     const count = Math.min(Math.max(1, Number(this.advanceCount) || 1), this.plan.pending_count);
-    this.api.payInstallmentAdvance(this.plan.id, count).subscribe(plan => this.plan = plan);
+    this.api.payInstallmentAdvance(this.plan.id, count).subscribe(plan => {
+      this.plan = plan;
+      this.closeAdvanceModal();
+    });
   }
 
   earlyPayoff() {
     if (!this.plan || !this.plan.pending_count) return;
     this.modalService.confirm(
       `Mark all ${this.plan.pending_count} remaining payments as paid?`,
-      { title: 'Early payoff', confirmLabel: 'Yes, pay off' }
+      { title: 'Early payoff', confirmLabel: 'Yes, pay off', cancelLabel: 'No' }
     ).subscribe(ok => {
       if (ok) this.api.payoffInstallment(this.plan!.id).subscribe(plan => this.plan = plan);
     });
