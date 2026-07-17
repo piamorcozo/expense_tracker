@@ -12,11 +12,11 @@
     <iconify-icon icon="ph:plant" class="stat-icon icon-primary"></iconify-icon>
     <div class="stat-label">Projected by Dec 30, {{ currentYear }}</div>
     <div class="stat-value primaryc">{{ fmt(summary.projected_year_end) }}</div>
-    <div class="stat-note">
+    <p class="stat-note">
       {{ summary.most_frequent_amount
         ? 'Based on your usual ' + fmt(summary.most_frequent_amount) + ' per cutoff, with ' + summary.remaining_cutoffs + ' cutoffs left.'
         : 'Add a few deposits so I can start predicting your year-end total.' }}
-    </div>
+    </p>
   </div>
 </div>
 

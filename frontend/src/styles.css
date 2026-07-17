@@ -68,6 +68,7 @@ iconify-icon{ font-size: 18px; vertical-align: -3px; color: currentColor; displa
 .brand-mark{
   width:38px; height:38px; border-radius:12px;
   overflow:hidden; flex-shrink:0;
+  background: var(--primary-light);
   box-shadow: var(--shadow);
 }
 .brand-mark img{
@@ -127,14 +128,19 @@ iconify-icon{ font-size: 18px; vertical-align: -3px; color: currentColor; displa
 .stat-row{ display:flex; gap:12px; margin-bottom:16px; }
 .stat-card{
   flex:1; background: var(--surface); border-radius: var(--radius-sm);
-  padding: 14px 16px; box-shadow: var(--shadow); border:1px solid var(--border);
+  padding: 16px; box-shadow: var(--shadow); border:1px solid var(--border);
+  display:flex; flex-direction:column; min-height:118px;
 }
-.stat-icon{ font-size:18px; margin-bottom:6px; }
-.stat-label{ font-size:12px; color:var(--text-muted); font-weight:500; }
-.stat-value{ font-size:19px; font-weight:700; margin-top:2px; font-family:'Poppins',sans-serif; }
+.stat-icon{ font-size:20px; margin-bottom:10px; display:block; }
+.stat-label{ font-size:12.5px; color:var(--text-muted); font-weight:500; }
+.stat-value{
+  font-size:26px; font-weight:700; margin-top:auto; padding-top:12px;
+  font-family:'Poppins',sans-serif; letter-spacing:-0.02em; line-height:1.1;
+}
 .stat-value.coral{ color: var(--coral); }
-.stat-value.mint{ color: var(--mint); }
-.stat-value.primaryc{ color: var(--primary-dark); }
+.stat-value.mint{ color: var(--primary); }
+.stat-value.primaryc{ color: var(--primary); }
+.stat-card .stat-note{ margin-top: 8px; padding-top: 0; }
 
 .twoup{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom: 18px; }
 .list-card{
@@ -213,7 +219,7 @@ iconify-icon{ font-size: 18px; vertical-align: -3px; color: currentColor; displa
 .ldh-remaining.mint{ color: var(--mint); }
 .ldh-actions{ display:flex; gap:10px; margin-top:16px; }
 .ldh-btn{ flex:1; padding:11px; border-radius:14px; font-weight:600; font-size:13px; border:none; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; }
-.ldh-btn.close{ background: var(--coral-light); color:#B85A40; }
+.ldh-btn.close{ background: var(--primary-light); color: var(--primary); }
 .ldh-btn.reopen{ background: var(--mint-light); color:var(--primary); }
 .ldh-btn.add{ background: var(--primary); color:white; }
 .ldh-btn.paid{ background: var(--mint-light); color:var(--primary); }
@@ -279,7 +285,8 @@ iconify-icon{ font-size: 18px; vertical-align: -3px; color: currentColor; displa
   border:1px solid var(--border); padding:8px 12px; border-radius:14px; margin:0 8px 8px 0;
   font-size:13px; font-weight:500;
 }
-.maint-tag button{ border:none; background:none; color: var(--coral); cursor:pointer; font-weight:700; display:inline-flex; align-items:center; }
+.maint-tag button{ border:none; background:none; color: var(--primary); cursor:pointer; font-weight:700; display:inline-flex; align-items:center; opacity:0.75; }
+.maint-tag button:hover{ opacity:1; }
 .add-inline{ display:flex; gap:8px; margin-top:8px; align-items:stretch; }
 .add-inline input{
   flex:1; min-width:0; padding:10px 14px; border-radius:14px; border:1px solid var(--border);
@@ -363,8 +370,23 @@ iconify-icon{ font-size: 18px; vertical-align: -3px; color: currentColor; displa
   padding: 18px 20px; color: var(--text); box-shadow: var(--shadow);
   border: 1px solid var(--border); margin-bottom:16px; position:relative; overflow:hidden;
 }
-.predictive-label{ font-size:12px; color: var(--text-muted); font-weight:600; }
-.predictive-amt{ font-size:28px; font-weight:700; font-family:'Poppins',sans-serif; margin-top:6px; color: var(--primary); letter-spacing:-0.02em; }
+.predictive-card.savings-hero{
+  background: var(--hero); color: white; border: none; box-shadow: var(--shadow-lg);
+}
+.predictive-card.savings-hero::before{
+  content:''; position:absolute; inset:0; pointer-events:none; opacity:0.07;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.55) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.55) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+.predictive-label{ font-size:12.5px; color: var(--text-muted); font-weight:500; position:relative; z-index:1; }
+.predictive-amt{
+  font-size:34px; font-weight:700; font-family:'Poppins',sans-serif; margin-top:10px;
+  color: var(--primary); letter-spacing:-0.02em; position:relative; z-index:1;
+}
+.predictive-card.savings-hero .predictive-label{ color: rgba(255,255,255,0.82); font-weight:600; }
+.predictive-card.savings-hero .predictive-amt{ color: white; }
 .predictive-note{ font-size:11.5px; color: var(--text-muted); margin-top:6px; line-height:1.4; }
 
 .user-pill{
