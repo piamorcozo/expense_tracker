@@ -68,11 +68,11 @@ iconify-icon{ font-size: 18px; vertical-align: -3px; color: currentColor; displa
 .brand-mark{
   width:38px; height:38px; border-radius:12px;
   overflow:hidden; flex-shrink:0;
-  background: var(--primary-light);
+  background: transparent;
   box-shadow: var(--shadow);
 }
 .brand-mark img{
-  width:100%; height:100%; object-fit:cover; display:block;
+  width:100%; height:100%; object-fit:contain; display:block;
 }
 .brand-name{ font-size:19px; font-weight:600; }
 .brand-sub{ font-size:11px; color:var(--text-muted); margin-top:-2px; }
