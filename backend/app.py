@@ -6,7 +6,10 @@ from sqlalchemy import text, inspect
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from config import Config
-from models import db, User, Bank, MustHave, ExpenseList, ExpenseItem, SavingsEntry, ItemStatusOption
+from models import (
+    db, User, Bank, MustHave, ExpenseList, ExpenseItem, SavingsEntry, ItemStatusOption,
+    InstallmentPlan, InstallmentPayment, next_due_date,
+)
 
 
 DEFAULT_PASSWORD = "cutoff"
@@ -439,6 +442,155 @@ def register_routes(app):
             "remaining_cutoffs": remaining_cutoffs,
             "projected_year_end": projected,
         })
+
+    # ---------------- Installments ----------------
+    @app.get("/api/installments")
+    def list_installments():
+        uid = get_user_id()
+        q = InstallmentPlan.query.filter_by(user_id=uid) if uid else InstallmentPlan.query
+        plans = q.order_by(InstallmentPlan.created_at.desc()).all()
+        return jsonify([p.to_dict(include_payments=False) for p in plans])
+
+    @app.get("/api/installments/upcoming")
+    def upcoming_installments():
+        """Next pending payment across all active plans (for dashboard widget)."""
+        uid = get_user_id()
+        q = InstallmentPlan.query.filter_by(user_id=uid, status="Active") if uid else InstallmentPlan.query.filter_by(status="Active")
+        plans = q.all()
+        candidates = []
+        today = date.today()
+        for plan in plans:
+            for pay in plan.payments:
+                if pay.status != "Pending":
+                    continue
+                days = (pay.due_date - today).days if pay.due_date else None
+                candidates.append({
+                    "plan_id": plan.id,
+                    "plan_name": plan.name,
+                    "payment_id": pay.id,
+                    "installment_number": pay.installment_number,
+                    "due_date": pay.due_date.isoformat() if pay.due_date else None,
+                    "amount": float(pay.amount),
+                    "days_remaining": days,
+                    "bank": plan.bank,
+                    "total_count": plan.total_count,
+                    "paid_count": sum(1 for p in plan.payments if p.status == "Paid"),
+                })
+        candidates.sort(key=lambda c: c["due_date"] or "9999-99-99")
+        return jsonify({
+            "next": candidates[0] if candidates else None,
+            "upcoming": candidates[:5],
+        })
+
+    @app.get("/api/installments/<int:plan_id>")
+    def get_installment(plan_id):
+        plan = InstallmentPlan.query.get_or_404(plan_id)
+        return jsonify(plan.to_dict(include_payments=True))
+
+    @app.post("/api/installments")
+    def create_installment():
+        data = request.get_json(force=True)
+        freq = (data.get("frequency") or "biweekly").lower()
+        if freq not in ("weekly", "biweekly", "monthly"):
+            return jsonify({"error": "frequency must be weekly, biweekly, or monthly"}), 400
+        start = _parse_date(data.get("start_date")) or date.today()
+        count = int(data.get("total_count") or 0)
+        amount = float(data.get("amount") or 0)
+        if count < 1 or amount <= 0:
+            return jsonify({"error": "amount and total_count are required"}), 400
+        name = (data.get("name") or "").strip()
+        if not name:
+            return jsonify({"error": "name is required"}), 400
+
+        plan = InstallmentPlan(
+            user_id=data["user_id"],
+            name=name,
+            amount=amount,
+            total_count=count,
+            frequency=freq,
+            start_date=start,
+            bank=data.get("bank"),
+            notes=data.get("notes"),
+            status="Active",
+        )
+        db.session.add(plan)
+        db.session.flush()
+
+        for i in range(count):
+            db.session.add(InstallmentPayment(
+                plan_id=plan.id,
+                installment_number=i + 1,
+                due_date=next_due_date(start, freq, i),
+                amount=amount,
+                status="Pending",
+            ))
+        db.session.commit()
+        return jsonify(plan.to_dict()), 201
+
+    @app.delete("/api/installments/<int:plan_id>")
+    def delete_installment(plan_id):
+        plan = InstallmentPlan.query.get_or_404(plan_id)
+        db.session.delete(plan)
+        db.session.commit()
+        return "", 204
+
+    @app.patch("/api/installment-payments/<int:payment_id>/status")
+    def set_installment_payment_status(payment_id):
+        pay = InstallmentPayment.query.get_or_404(payment_id)
+        data = request.get_json(force=True)
+        status = data.get("status")
+        if status not in ("Paid", "Pending"):
+            return jsonify({"error": "status must be Paid or Pending"}), 400
+        pay.status = status
+        if status == "Paid":
+            pay.paid_date = _parse_date(data.get("paid_date")) or date.today()
+            # Advance if paid before due date
+            if pay.due_date and pay.paid_date < pay.due_date:
+                pay.is_advance = True
+            elif data.get("is_advance"):
+                pay.is_advance = True
+        else:
+            pay.paid_date = None
+            pay.is_advance = False
+        plan = pay.plan
+        _sync_plan_status(plan)
+        db.session.commit()
+        return jsonify(plan.to_dict())
+
+    @app.post("/api/installments/<int:plan_id>/advance")
+    def pay_installment_advance(plan_id):
+        """Mark the next N pending installments as Paid (advance payment)."""
+        plan = InstallmentPlan.query.get_or_404(plan_id)
+        data = request.get_json(force=True) or {}
+        count = max(1, int(data.get("count") or 1))
+        today = date.today()
+        pending = [p for p in plan.payments if p.status == "Pending"]
+        for pay in pending[:count]:
+            pay.status = "Paid"
+            pay.paid_date = today
+            pay.is_advance = bool(pay.due_date and today < pay.due_date)
+        _sync_plan_status(plan)
+        db.session.commit()
+        return jsonify(plan.to_dict())
+
+    @app.post("/api/installments/<int:plan_id>/payoff")
+    def payoff_installment(plan_id):
+        """Early payoff — mark all remaining pending installments as Paid."""
+        plan = InstallmentPlan.query.get_or_404(plan_id)
+        today = date.today()
+        for pay in plan.payments:
+            if pay.status == "Pending":
+                pay.status = "Paid"
+                pay.paid_date = today
+                pay.is_advance = bool(pay.due_date and today < pay.due_date)
+        _sync_plan_status(plan)
+        db.session.commit()
+        return jsonify(plan.to_dict())
+
+
+def _sync_plan_status(plan: InstallmentPlan):
+    pending = [p for p in plan.payments if p.status == "Pending"]
+    plan.status = "Completed" if not pending else "Active"
 
 
 def _parse_date(val):

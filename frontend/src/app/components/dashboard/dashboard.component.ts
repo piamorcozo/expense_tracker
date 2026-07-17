@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ApiService } from '../../core/services/api.service';
 import { ModalService } from '../../core/services/modal.service';
-import { ExpenseList } from '../../core/models/models';
+import { ExpenseList, UpcomingInstallment } from '../../core/models/models';
 import { resolveListIcon } from '../../core/list-icons';
 
 type PendingFilter = 'all' | 'month' | 'quarter' | 'custom';
@@ -20,6 +20,7 @@ type PendingFilter = 'all' | 'month' | 'quarter' | 'custom';
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   lists: ExpenseList[] = [];
+  nextInstallment: UpcomingInstallment | null = null;
   pendingFilter: PendingFilter = 'all';
   customFrom = '';
   customTo = '';
@@ -32,12 +33,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.load();
     this.subs.add(this.modalService.listCreated$.subscribe(() => this.load()));
     this.subs.add(this.modalService.itemSaved$.subscribe(() => this.load()));
+    this.subs.add(this.modalService.installmentSaved$.subscribe(() => this.load()));
   }
 
   ngOnDestroy() { this.subs.unsubscribe(); }
 
   load() {
     this.api.getLists().subscribe(lists => this.lists = lists);
+    this.api.getUpcomingInstallments().subscribe(res => this.nextInstallment = res.next);
   }
 
   get openCutoff(): ExpenseList | undefined {
@@ -114,6 +117,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   goToList(id: number) { this.router.navigate(['/lists', id]); }
+
+  goToInstallment(id: number) { this.router.navigate(['/installments', id]); }
+
+  daysLabel(days: number | null): string {
+    if (days === null || days === undefined) return '';
+    if (days === 0) return 'Due today';
+    if (days > 0) return `${days} day${days === 1 ? '' : 's'} left`;
+    const n = Math.abs(days);
+    return `${n} day${n === 1 ? '' : 's'} overdue`;
+  }
+
+  formatDate(dstr: string): string {
+    const d = new Date(dstr + 'T00:00:00');
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  }
 
   quickAdd(e: Event, listId: number) {
     e.stopPropagation();

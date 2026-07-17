@@ -1,0 +1,61 @@
+<div class="modal-overlay" *ngIf="open" (click)="onOverlayClick($event)">
+  <div class="modal">
+    <div class="modal-title">
+      <iconify-icon icon="ph:calendar-check" class="icon-primary"></iconify-icon>
+      New installment plan
+    </div>
+
+    <div class="field">
+      <label>Plan name</label>
+      <input type="text" [(ngModel)]="name" placeholder="e.g. Phone, Laptop, Sofa">
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Amount per payment</label>
+        <input type="number" [(ngModel)]="amount" placeholder="0.00">
+      </div>
+      <div class="field">
+        <label># of payments</label>
+        <input type="number" [(ngModel)]="totalCount" min="1" placeholder="12">
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Frequency</label>
+        <select [(ngModel)]="frequency">
+          <option value="weekly">Weekly</option>
+          <option value="biweekly">Bi-weekly</option>
+          <option value="monthly">Monthly</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Start / first due</label>
+        <input type="date" [(ngModel)]="startDate">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Bank (optional)</label>
+      <select [(ngModel)]="bank">
+        <option value="">—</option>
+        <option *ngFor="let b of banks" [value]="b.name">{{ b.name }}</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Notes (optional)</label>
+      <input type="text" [(ngModel)]="notes" placeholder="Any notes...">
+    </div>
+
+    <div class="inst-preview" *ngIf="previewTotal > 0">
+      Will create <b>{{ totalCount }}</b> payment rows · Total ₱{{ previewTotal | number:'1.0-2' }}
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-secondary" (click)="close()">Cancel</button>
+      <button class="btn-primary" (click)="save()">Create plan</button>
+    </div>
+  </div>
+</div>

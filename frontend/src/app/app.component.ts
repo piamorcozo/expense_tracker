@@ -14,6 +14,7 @@ import { SavingsModalComponent } from './components/shell/savings-modal.componen
 import { SwitchAccountModalComponent } from './components/shell/switch-account-modal.component';
 import { ConfirmModalComponent } from './components/shell/confirm-modal.component';
 import { SuccessModalComponent } from './components/shell/success-modal.component';
+import { InstallmentModalComponent } from './components/shell/installment-modal.component';
 
 @Component({
   selector: 'app-root',
@@ -21,7 +22,8 @@ import { SuccessModalComponent } from './components/shell/success-modal.componen
   imports: [
     CommonModule, RouterOutlet, RouterLink, RouterLinkActive,
     NewListModalComponent, ItemModalComponent, SavingsModalComponent,
-    SwitchAccountModalComponent, ConfirmModalComponent, SuccessModalComponent
+    SwitchAccountModalComponent, ConfirmModalComponent, SuccessModalComponent,
+    InstallmentModalComponent
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
@@ -43,7 +45,7 @@ export class AppComponent implements OnInit {
     this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe((e: any) => {
       const url: string = e.urlAfterRedirects;
       this.isLoginPage = url.startsWith('/login');
-      this.isListDetail = url.startsWith('/lists/');
+      this.isListDetail = /^\/lists\/\d+/.test(url) || /^\/installments\/\d+/.test(url);
       this.currentRoute = url.split('/')[1] || 'dashboard';
       this.showFab = !this.isLoginPage && !this.isListDetail && this.currentRoute !== 'history';
     });
@@ -68,6 +70,8 @@ export class AppComponent implements OnInit {
   onFabClick() {
     if (this.currentRoute === 'savings') {
       this.modalService.openSavingsModal();
+    } else if (this.currentRoute === 'installments') {
+      this.modalService.openInstallmentModal();
     } else {
       this.modalService.openNewList();
     }

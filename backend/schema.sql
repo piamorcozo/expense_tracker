@@ -104,3 +104,36 @@ CREATE TABLE IF NOT EXISTS savings_entries (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     INDEX idx_user_date (user_id, deposit_date)
 ) ENGINE=InnoDB;
+
+-- ------------------------------------------------------------
+-- Installment plans + scheduled payments
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS installment_plans (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    name VARCHAR(150) NOT NULL,
+    amount DECIMAL(12,2) NOT NULL,
+    total_count INT NOT NULL,
+    frequency VARCHAR(20) NOT NULL DEFAULT 'biweekly',
+    start_date DATE NOT NULL,
+    bank VARCHAR(100) NULL,
+    notes VARCHAR(255) NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'Active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_user_status (user_id, status)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS installment_payments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    plan_id INT NOT NULL,
+    installment_number INT NOT NULL,
+    due_date DATE NOT NULL,
+    amount DECIMAL(12,2) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'Pending',
+    paid_date DATE NULL,
+    is_advance TINYINT(1) NOT NULL DEFAULT 0,
+    FOREIGN KEY (plan_id) REFERENCES installment_plans(id) ON DELETE CASCADE,
+    INDEX idx_plan (plan_id),
+    INDEX idx_due (due_date, status)
+) ENGINE=InnoDB;

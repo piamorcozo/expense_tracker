@@ -1,0 +1,63 @@
+.inst-progress-wrap { margin-top: 12px; }
+.inst-progress-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.inst-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--coral), #E87A8F);
+}
+.inst-progress-label {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+.inst-summary-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 14px;
+}
+.inst-foot-label { font-size: 11px; color: var(--text-muted); }
+.inst-foot-value { font-size: 14px; font-weight: 700; margin-top: 2px; }
+.inst-foot-value.mint { color: var(--mint); }
+
+.advance-row {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+.advance-input {
+  width: 56px;
+  flex-shrink: 0;
+  padding: 0 10px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  font-family: inherit;
+  font-weight: 600;
+  text-align: center;
+}
+.advance-row .ldh-btn { flex: 1; }
+
+.delete-plan-btn {
+  margin-top: 12px;
+  width: 100%;
+  border: none;
+  background: none;
+  color: var(--coral);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 8px;
+}
+
+.pay-row .status-badge { cursor: pointer; }
+.pay-paid { opacity: 0.92; }

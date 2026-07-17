@@ -39,6 +39,13 @@ export class ModalService {
   openSavingsModal() { this.savingsModalOpenSubject.next(true); }
   closeSavingsModal() { this.savingsModalOpenSubject.next(false); }
 
+  // New installment plan modal
+  private installmentModalOpenSubject = new BehaviorSubject<boolean>(false);
+  installmentModalOpen$ = this.installmentModalOpenSubject.asObservable();
+  openInstallmentModal() { this.installmentModalOpenSubject.next(true); }
+  closeInstallmentModal() { this.installmentModalOpenSubject.next(false); }
+  installmentSaved$ = new Subject<number>();
+
   // Switch account / logout modal
   private switchAccountModalSubject = new BehaviorSubject<boolean>(false);
   switchAccountModal$ = this.switchAccountModalSubject.asObservable();

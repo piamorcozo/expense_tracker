@@ -52,6 +52,24 @@
   </div>
 </div>
 
+<div class="upcoming-inst-card" *ngIf="nextInstallment" (click)="goToInstallment(nextInstallment.plan_id)">
+  <div class="upcoming-inst-top">
+    <div class="upcoming-inst-label">
+      <iconify-icon icon="ph:calendar-check" class="ic-sm"></iconify-icon>
+      Upcoming Installments
+    </div>
+    <iconify-icon icon="ph:caret-right" class="chev-mini"></iconify-icon>
+  </div>
+  <div class="upcoming-inst-name">{{ nextInstallment.plan_name }}</div>
+  <div class="upcoming-inst-amt">{{ fmt(nextInstallment.amount) }}</div>
+  <div class="upcoming-inst-meta">
+    Due {{ formatDate(nextInstallment.due_date) }}
+    · {{ daysLabel(nextInstallment.days_remaining) }}
+    · #{{ nextInstallment.installment_number }}/{{ nextInstallment.total_count }}
+  </div>
+  <div class="inst-progress-bar mini"><div class="inst-progress-fill" [style.width.%]="(nextInstallment.paid_count / nextInstallment.total_count) * 100"></div></div>
+</div>
+
 <div class="row-between"><h3>Pending lists</h3></div>
 
 <div class="filter-bar">

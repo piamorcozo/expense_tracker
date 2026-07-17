@@ -1,0 +1,36 @@
+<div class="section-title">Installments</div>
+<div class="section-desc">Track payment plans — mark paid, pay in advance, or finish early.</div>
+
+<div *ngIf="plans.length === 0" class="empty-state">
+  <iconify-icon icon="ph:calendar-check" class="emoji icon-muted"></iconify-icon>
+  <div>No installment plans yet — tap + to create one.</div>
+</div>
+
+<div class="inst-card" *ngFor="let p of plans" (click)="openPlan(p.id)">
+  <div class="inst-card-top">
+    <div>
+      <div class="inst-card-title">{{ p.name }}</div>
+      <div class="inst-card-meta">
+        {{ freqLabel(p.frequency) }} · {{ fmt(p.amount) }}/payment
+        <span *ngIf="p.bank"> · {{ p.bank }}</span>
+      </div>
+    </div>
+    <span class="status-badge" [ngClass]="p.status === 'Completed' ? 'status-open' : 'status-pending'">{{ p.status }}</span>
+  </div>
+
+  <div class="inst-progress-wrap">
+    <div class="inst-progress-bar"><div class="inst-progress-fill" [style.width.%]="p.progress_pct"></div></div>
+    <div class="inst-progress-label">{{ p.paid_count }}/{{ p.total_count }} paid — {{ p.progress_pct }}% done</div>
+  </div>
+
+  <div class="inst-card-foot">
+    <div>
+      <div class="inst-foot-label">Next due</div>
+      <div class="inst-foot-value">{{ p.next_due_date ? formatDate(p.next_due_date) : 'All paid' }}</div>
+    </div>
+    <div class="inst-foot-right">
+      <div class="inst-foot-label">Remaining</div>
+      <div class="inst-foot-value">{{ fmt(p.remaining_amount) }}</div>
+    </div>
+  </div>
+</div>

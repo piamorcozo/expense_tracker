@@ -4,7 +4,8 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { UserService } from './user.service';
 import {
-  User, Bank, MustHave, ItemStatusOption, ExpenseList, ExpenseItem, SavingsEntry, SavingsSummary
+  User, Bank, MustHave, ItemStatusOption, ExpenseList, ExpenseItem, SavingsEntry, SavingsSummary,
+  InstallmentPlan, UpcomingInstallmentsResponse
 } from '../models/models';
 
 @Injectable({ providedIn: 'root' })
@@ -116,5 +117,33 @@ export class ApiService {
   }
   getSavingsSummary(): Observable<SavingsSummary> {
     return this.http.get<SavingsSummary>(`${this.base}/savings/summary`, { params: { user_id: this.userId ?? '' } });
+  }
+
+  // ---------- Installments ----------
+  getInstallments(): Observable<InstallmentPlan[]> {
+    return this.http.get<InstallmentPlan[]>(`${this.base}/installments`, { params: { user_id: this.userId ?? '' } });
+  }
+  getInstallment(id: number): Observable<InstallmentPlan> {
+    return this.http.get<InstallmentPlan>(`${this.base}/installments/${id}`);
+  }
+  getUpcomingInstallments(): Observable<UpcomingInstallmentsResponse> {
+    return this.http.get<UpcomingInstallmentsResponse>(`${this.base}/installments/upcoming`, {
+      params: { user_id: this.userId ?? '' }
+    });
+  }
+  createInstallment(payload: Partial<InstallmentPlan> & { name: string; amount: number; total_count: number; frequency: string; start_date: string }): Observable<InstallmentPlan> {
+    return this.http.post<InstallmentPlan>(`${this.base}/installments`, { ...payload, user_id: this.userId });
+  }
+  deleteInstallment(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.base}/installments/${id}`);
+  }
+  setInstallmentPaymentStatus(paymentId: number, status: 'Paid' | 'Pending'): Observable<InstallmentPlan> {
+    return this.http.patch<InstallmentPlan>(`${this.base}/installment-payments/${paymentId}/status`, { status });
+  }
+  payInstallmentAdvance(planId: number, count = 1): Observable<InstallmentPlan> {
+    return this.http.post<InstallmentPlan>(`${this.base}/installments/${planId}/advance`, { count });
+  }
+  payoffInstallment(planId: number): Observable<InstallmentPlan> {
+    return this.http.post<InstallmentPlan>(`${this.base}/installments/${planId}/payoff`, {});
   }
 }

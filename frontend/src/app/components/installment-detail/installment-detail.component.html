@@ -1,0 +1,75 @@
+<ng-container *ngIf="plan">
+  <div class="list-detail-header">
+    <div class="ldh-top">
+      <div>
+        <div class="ldh-name">{{ plan.name }}</div>
+        <div class="ldh-meta">
+          {{ freqLabel(plan.frequency) }} · {{ fmt(plan.amount) }} × {{ plan.total_count }}
+          <span *ngIf="plan.bank"> · {{ plan.bank }}</span>
+        </div>
+      </div>
+      <span class="status-badge" [ngClass]="plan.status === 'Completed' ? 'status-open' : 'status-pending'">{{ plan.status }}</span>
+    </div>
+
+    <div class="inst-progress-wrap" style="margin-top:14px">
+      <div class="inst-progress-bar"><div class="inst-progress-fill" [style.width.%]="plan.progress_pct"></div></div>
+      <div class="inst-progress-label">{{ plan.paid_count }}/{{ plan.total_count }} paid — {{ plan.progress_pct }}% done</div>
+    </div>
+
+    <div class="inst-summary-row">
+      <div>
+        <div class="inst-foot-label">Paid</div>
+        <div class="inst-foot-value mint">{{ fmt(plan.paid_amount) }}</div>
+      </div>
+      <div>
+        <div class="inst-foot-label">Remaining</div>
+        <div class="inst-foot-value">{{ fmt(plan.remaining_amount) }}</div>
+      </div>
+      <div>
+        <div class="inst-foot-label">Total</div>
+        <div class="inst-foot-value">{{ fmt(plan.total_amount) }}</div>
+      </div>
+    </div>
+
+    <div class="ldh-actions" *ngIf="plan.pending_count > 0" style="flex-wrap:wrap">
+      <div class="advance-row">
+        <input type="number" class="advance-input" [(ngModel)]="advanceCount" min="1" [max]="plan.pending_count">
+        <button class="ldh-btn paid" (click)="payAdvance()">
+          <iconify-icon icon="ph:lightning" class="ic-sm"></iconify-icon> Pay advance
+        </button>
+      </div>
+      <button class="ldh-btn add" (click)="earlyPayoff()">
+        <iconify-icon icon="ph:checks" class="ic-sm"></iconify-icon> Early payoff
+      </button>
+    </div>
+    <button class="delete-plan-btn" (click)="deletePlan()">Delete plan</button>
+  </div>
+
+  <div class="row-between"><h3>Payment schedule</h3></div>
+
+  <div class="item-row pay-row" *ngFor="let pay of plan.payments"
+       [class.pay-paid]="pay.status === 'Paid'">
+    <div class="item-left">
+      <div class="item-emoji">
+        <iconify-icon [icon]="pay.status === 'Paid' ? 'ph:check-circle-fill' : 'ph:circle'"
+                      [class.icon-mint]="pay.status === 'Paid'"
+                      [class.icon-muted]="pay.status !== 'Paid'"></iconify-icon>
+      </div>
+      <div>
+        <div class="item-name">#{{ pay.installment_number }} · {{ formatDate(pay.due_date) }}</div>
+        <div class="item-meta" *ngIf="pay.status === 'Pending'">{{ dueLabel(pay.due_date) }}</div>
+        <div class="item-meta" *ngIf="pay.status === 'Paid'">
+          Paid {{ formatDate(pay.paid_date) }}<span *ngIf="pay.is_advance"> · Advance</span>
+        </div>
+      </div>
+    </div>
+    <div class="item-right">
+      <div class="item-amt">{{ fmt(pay.amount) }}</div>
+      <button type="button" class="status-badge"
+              [ngClass]="pay.status === 'Paid' ? 'status-open' : 'status-pending'"
+              (click)="togglePaid(pay)">
+        {{ pay.status }}
+      </button>
+    </div>
+  </div>
+</ng-container>
