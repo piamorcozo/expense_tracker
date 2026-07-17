@@ -26,5 +26,5 @@
 .icon-pick.active {
   background: color-mix(in srgb, var(--coral) 22%, var(--surface));
   border-color: var(--coral);
-  color: #C9603F;
+  color: var(--coral);
 }

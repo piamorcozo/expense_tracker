@@ -1,10 +1,10 @@
 .predictive-bg-icon{
   position: absolute;
   font-size: 76px;
-  opacity: 0.18;
+  opacity: 0.08;
   right: -10px;
   top: -16px;
-  color: white;
+  color: var(--primary);
   pointer-events: none;
 }
 

@@ -1,15 +1,19 @@
 <div class="hero-card" *ngIf="openCutoff">
   <div class="hero-top">
     <div>
-      <div class="hero-label">Remaining budget</div>
-      <div class="hero-amount">{{ fmt(openCutoff.remaining) }}</div>
+      <div class="hero-label-row">
+        <div class="hero-label-icon"><iconify-icon icon="ph:wallet" class="icon-white"></iconify-icon></div>
+        <div class="hero-label">Remaining budget</div>
+      </div>
+      <div class="hero-sub">Cutoff overview & spending</div>
     </div>
     <button class="cutoff-pill" (click)="goToList(openCutoff.id)">{{ openCutoff.month }} {{ openCutoff.day }} · {{ openCutoff.status }}</button>
   </div>
+  <div class="hero-amount">{{ fmt(openCutoff.remaining) }}</div>
   <div class="hero-jar">
     <svg class="jar-ring" viewBox="0 0 52 52">
-      <circle cx="26" cy="26" r="22" stroke="rgba(255,255,255,0.25)" stroke-width="6" fill="none"/>
-      <circle cx="26" cy="26" r="22" stroke="white" stroke-width="6" fill="none"
+      <circle cx="26" cy="26" r="22" stroke="rgba(255,255,255,0.22)" stroke-width="5" fill="none"/>
+      <circle cx="26" cy="26" r="22" stroke="white" stroke-width="5" fill="none"
         stroke-linecap="round" [attr.stroke-dasharray]="138"
         [attr.stroke-dashoffset]="138 - (138 * pct/100)" transform="rotate(-90 26 26)"/>
     </svg>
@@ -45,7 +49,7 @@
   <div class="list-card" *ngFor="let o of openOthers" (click)="goToList(o.id)">
     <button class="list-card-add" (click)="quickAdd($event, o.id)"><iconify-icon icon="ph:plus-bold" class="ic-sm"></iconify-icon></button>
     <div class="list-card-icon" style="background:var(--coral-light);">
-      <iconify-icon [icon]="iconFor(o)" style="color:#C9603F"></iconify-icon>
+      <iconify-icon [icon]="iconFor(o)" class="icon-coral"></iconify-icon>
     </div>
     <div class="list-card-title">{{ o.name }}</div>
     <div class="list-card-meta">{{ o.item_count ?? 0 }} items · {{ o.status }}</div>

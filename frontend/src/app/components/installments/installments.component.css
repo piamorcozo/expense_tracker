@@ -28,7 +28,7 @@
 .inst-progress-fill {
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--coral), #E87A8F);
+  background: var(--primary);
   transition: width .25s ease;
 }
 .inst-progress-label {

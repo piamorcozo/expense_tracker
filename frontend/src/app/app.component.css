@@ -14,7 +14,7 @@
     color: var(--text-muted); font-weight:600; font-size:14.5px; cursor:pointer; border:none; background:none;
     text-align:left; width:100%;
   }
-  .navitem.active{ background: var(--primary-light); color: var(--primary-dark); }
+  .navitem.active{ background: var(--text); color: var(--surface); }
   .navitem:hover:not(.active){ background: var(--surface-2); }
 }
 .topbar{ display:flex; align-items:center; justify-content:space-between; padding: 20px 20px 8px; }

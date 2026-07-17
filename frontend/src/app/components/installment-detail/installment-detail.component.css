@@ -8,7 +8,7 @@
 .inst-progress-fill {
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--coral), #E87A8F);
+  background: var(--primary);
 }
 .inst-progress-label {
   font-size: 11.5px;

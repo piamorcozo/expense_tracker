@@ -1,9 +1,10 @@
 .upcoming-inst-card {
-  background: linear-gradient(135deg, #F7B2C0 0%, #EF8FA3 50%, #E87A8F 100%);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 16px 18px;
-  color: white;
-  box-shadow: 0 10px 28px rgba(232, 122, 143, 0.28);
+  color: var(--text);
+  box-shadow: var(--shadow);
   margin: 4px 0 18px;
   cursor: pointer;
 }
@@ -16,7 +17,7 @@
 .upcoming-inst-label {
   font-size: 12px;
   font-weight: 600;
-  opacity: 0.95;
+  color: var(--text-muted);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -31,22 +32,24 @@
   font-weight: 700;
   margin-top: 2px;
   font-family: 'Poppins', sans-serif;
+  color: var(--primary);
+  letter-spacing: -0.02em;
 }
 .upcoming-inst-meta {
   font-size: 12px;
-  opacity: 0.92;
+  color: var(--text-muted);
   margin-top: 4px;
 }
 .inst-progress-bar.mini {
   height: 6px;
   border-radius: 999px;
-  background: rgba(255,255,255,0.28);
+  background: var(--surface-2);
   overflow: hidden;
   margin-top: 12px;
 }
 .inst-progress-bar.mini .inst-progress-fill {
   height: 100%;
-  background: white;
+  background: var(--primary);
   border-radius: 999px;
 }
-.upcoming-inst-card .chev-mini { color: white; opacity: 0.9; }
+.upcoming-inst-card .chev-mini { color: var(--text-muted); }
