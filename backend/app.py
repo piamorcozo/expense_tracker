@@ -8,7 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from config import Config
 from models import (
     db, User, Bank, MustHave, ExpenseList, ExpenseItem, SavingsEntry, ItemStatusOption,
-    InstallmentPlan, InstallmentPayment, next_due_date,
+    InstallmentPlan, InstallmentPayment, next_due_date, payments_per_month,
 )
 
 
@@ -74,6 +74,9 @@ def _ensure_schema():
 
         if "expense_lists" in insp.get_table_names() and not has_column("expense_lists", "icon"):
             conn.execute(text("ALTER TABLE expense_lists ADD COLUMN icon VARCHAR(80) NULL"))
+
+        if "installment_plans" in insp.get_table_names() and not has_column("installment_plans", "months"):
+            conn.execute(text("ALTER TABLE installment_plans ADD COLUMN months INT NULL"))
 
 
 def _seed_default_user_if_empty():
@@ -464,6 +467,8 @@ def register_routes(app):
                 if pay.status != "Pending":
                     continue
                 days = (pay.due_date - today).days if pay.due_date else None
+                paid_count = sum(1 for p in plan.payments if p.status == "Paid")
+                payment_count = len(plan.payments) or plan.total_count or 0
                 candidates.append({
                     "plan_id": plan.id,
                     "plan_name": plan.name,
@@ -473,8 +478,9 @@ def register_routes(app):
                     "amount": float(pay.amount),
                     "days_remaining": days,
                     "bank": plan.bank,
-                    "total_count": plan.total_count,
-                    "paid_count": sum(1 for p in plan.payments if p.status == "Paid"),
+                    "months": plan.months,
+                    "total_count": payment_count,
+                    "paid_count": paid_count,
                 })
         candidates.sort(key=lambda c: c["due_date"] or "9999-99-99")
         return jsonify({
@@ -494,19 +500,24 @@ def register_routes(app):
         if freq not in ("weekly", "biweekly", "monthly"):
             return jsonify({"error": "frequency must be weekly, biweekly, or monthly"}), 400
         start = _parse_date(data.get("start_date")) or date.today()
-        count = int(data.get("total_count") or 0)
+        # total_count from the client means duration in months
+        months = int(data.get("months") or data.get("total_count") or 0)
         amount = float(data.get("amount") or 0)
-        if count < 1 or amount <= 0:
-            return jsonify({"error": "amount and total_count are required"}), 400
+        if months < 1 or amount <= 0:
+            return jsonify({"error": "amount and months (duration) are required"}), 400
         name = (data.get("name") or "").strip()
         if not name:
             return jsonify({"error": "name is required"}), 400
+
+        per_month = payments_per_month(freq)
+        payment_count = months * per_month
 
         plan = InstallmentPlan(
             user_id=data["user_id"],
             name=name,
             amount=amount,
-            total_count=count,
+            months=months,
+            total_count=payment_count,
             frequency=freq,
             start_date=start,
             bank=data.get("bank"),
@@ -516,7 +527,7 @@ def register_routes(app):
         db.session.add(plan)
         db.session.flush()
 
-        for i in range(count):
+        for i in range(payment_count):
             db.session.add(InstallmentPayment(
                 plan_id=plan.id,
                 installment_number=i + 1,

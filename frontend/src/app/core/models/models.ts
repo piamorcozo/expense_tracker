@@ -82,6 +82,9 @@ export interface InstallmentPlan {
   id: number;
   name: string;
   amount: number;
+  months: number | null;
+  payments_per_month: number;
+  monthly_amount: number;
   total_count: number;
   frequency: InstallmentFrequency;
   start_date: string;

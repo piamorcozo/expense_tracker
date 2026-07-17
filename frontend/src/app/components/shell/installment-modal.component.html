@@ -12,12 +12,12 @@
 
     <div class="field-row">
       <div class="field">
-        <label>Amount per payment</label>
+        <label>Amount per cutoff</label>
         <input type="number" [(ngModel)]="amount" placeholder="0.00">
       </div>
       <div class="field">
-        <label># of payments</label>
-        <input type="number" [(ngModel)]="totalCount" min="1" placeholder="12">
+        <label># of months</label>
+        <input type="number" [(ngModel)]="months" min="1" placeholder="12">
       </div>
     </div>
 
@@ -25,9 +25,9 @@
       <div class="field">
         <label>Frequency</label>
         <select [(ngModel)]="frequency">
-          <option value="weekly">Weekly</option>
-          <option value="biweekly">Bi-weekly</option>
-          <option value="monthly">Monthly</option>
+          <option value="weekly">Weekly (4× / month)</option>
+          <option value="biweekly">Bi-weekly (2× / month)</option>
+          <option value="monthly">Monthly (1× / month)</option>
         </select>
       </div>
       <div class="field">
@@ -50,7 +50,9 @@
     </div>
 
     <div class="inst-preview" *ngIf="previewTotal > 0">
-      Will create <b>{{ totalCount }}</b> payment rows · Total ₱{{ previewTotal | number:'1.0-2' }}
+      ₱{{ monthlyAmount | number:'1.0-2' }}/mo × {{ months }} mo
+      · {{ paymentCount }} cutoffs
+      · Total ₱{{ previewTotal | number:'1.0-2' }}
     </div>
 
     <div class="modal-actions">

@@ -4,7 +4,8 @@
       <div>
         <div class="ldh-name">{{ plan.name }}</div>
         <div class="ldh-meta">
-          {{ freqLabel(plan.frequency) }} · {{ fmt(plan.amount) }} × {{ plan.total_count }}
+          {{ freqLabel(plan.frequency) }} · {{ fmt(plan.amount) }}/cutoff
+          <span *ngIf="plan.months"> · {{ fmt(plan.monthly_amount) }}/mo × {{ plan.months }}</span>
           <span *ngIf="plan.bank"> · {{ plan.bank }}</span>
         </div>
       </div>

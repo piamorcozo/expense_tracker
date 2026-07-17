@@ -113,6 +113,7 @@ CREATE TABLE IF NOT EXISTS installment_plans (
     user_id INT NOT NULL,
     name VARCHAR(150) NOT NULL,
     amount DECIMAL(12,2) NOT NULL,
+    months INT NULL,
     total_count INT NOT NULL,
     frequency VARCHAR(20) NOT NULL DEFAULT 'biweekly',
     start_date DATE NOT NULL,

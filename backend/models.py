@@ -13,6 +13,11 @@ def _add_months(d: date, months: int) -> date:
     return date(year, month, day)
 
 
+def payments_per_month(frequency: str) -> int:
+    """How many cutoffs fall in a month for a given frequency."""
+    return {"weekly": 4, "biweekly": 2, "monthly": 1}.get(frequency, 1)
+
+
 def next_due_date(start: date, frequency: str, index: int) -> date:
     """index is 0-based installment number."""
     if frequency == "weekly":
@@ -154,8 +159,9 @@ class InstallmentPlan(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     name = db.Column(db.String(150), nullable=False)
-    amount = db.Column(db.Numeric(12, 2), nullable=False)  # per installment
-    total_count = db.Column(db.Integer, nullable=False)
+    amount = db.Column(db.Numeric(12, 2), nullable=False)  # per cutoff / payment
+    months = db.Column(db.Integer, nullable=True)  # duration in months
+    total_count = db.Column(db.Integer, nullable=False)  # total payment rows (months × per month)
     frequency = db.Column(db.String(20), nullable=False, default="biweekly")  # weekly|biweekly|monthly
     start_date = db.Column(db.Date, nullable=False)
     bank = db.Column(db.String(100), nullable=True)
@@ -175,14 +181,23 @@ class InstallmentPlan(db.Model):
         paid = [p for p in self.payments if p.status == "Paid"]
         pending = [p for p in self.payments if p.status == "Pending"]
         paid_count = len(paid)
-        total = self.total_count or len(self.payments)
-        pct = round((paid_count / total) * 100) if total else 0
+        payment_count = len(self.payments) or self.total_count or 0
+        per_month = payments_per_month(self.frequency)
+        months = self.months
+        if not months and payment_count and per_month:
+            # Legacy plans: infer months when possible
+            months = payment_count // per_month if payment_count % per_month == 0 else payment_count
+        pct = round((paid_count / payment_count) * 100) if payment_count else 0
         next_pending = pending[0] if pending else None
+        amt = float(self.amount)
         data = {
             "id": self.id,
             "name": self.name,
-            "amount": float(self.amount),
-            "total_count": total,
+            "amount": amt,
+            "months": months,
+            "payments_per_month": per_month,
+            "monthly_amount": amt * per_month,
+            "total_count": payment_count,
             "frequency": self.frequency,
             "start_date": self.start_date.isoformat() if self.start_date else None,
             "bank": self.bank,
@@ -191,9 +206,9 @@ class InstallmentPlan(db.Model):
             "paid_count": paid_count,
             "pending_count": len(pending),
             "progress_pct": pct,
-            "total_amount": float(self.amount) * total,
-            "paid_amount": float(self.amount) * paid_count,
-            "remaining_amount": float(self.amount) * len(pending),
+            "total_amount": amt * payment_count,
+            "paid_amount": amt * paid_count,
+            "remaining_amount": amt * len(pending),
             "next_due_date": next_pending.due_date.isoformat() if next_pending and next_pending.due_date else None,
             "next_amount": float(next_pending.amount) if next_pending else None,
         }

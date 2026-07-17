@@ -11,7 +11,8 @@
     <div>
       <div class="inst-card-title">{{ p.name }}</div>
       <div class="inst-card-meta">
-        {{ freqLabel(p.frequency) }} · {{ fmt(p.amount) }}/payment
+        {{ freqLabel(p.frequency) }} · {{ fmt(p.amount) }}/cutoff
+        <span *ngIf="p.months"> · {{ p.months }} mo</span>
         <span *ngIf="p.bank"> · {{ p.bank }}</span>
       </div>
     </div>

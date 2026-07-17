@@ -131,7 +131,7 @@ export class ApiService {
       params: { user_id: this.userId ?? '' }
     });
   }
-  createInstallment(payload: Partial<InstallmentPlan> & { name: string; amount: number; total_count: number; frequency: string; start_date: string }): Observable<InstallmentPlan> {
+  createInstallment(payload: Partial<InstallmentPlan> & { name: string; amount: number; months: number; frequency: string; start_date: string }): Observable<InstallmentPlan> {
     return this.http.post<InstallmentPlan>(`${this.base}/installments`, { ...payload, user_id: this.userId });
   }
   deleteInstallment(id: number): Observable<void> {

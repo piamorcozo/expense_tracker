@@ -19,7 +19,7 @@ export class InstallmentModalComponent {
   banks: Bank[] = [];
   name = '';
   amount: number | null = null;
-  totalCount: number | null = 12;
+  months: number | null = 12;
   frequency: InstallmentFrequency = 'biweekly';
   startDate = '';
   bank = '';
@@ -35,7 +35,7 @@ export class InstallmentModalComponent {
   reset() {
     this.name = '';
     this.amount = null;
-    this.totalCount = 12;
+    this.months = 12;
     this.frequency = 'biweekly';
     this.startDate = new Date().toISOString().slice(0, 10);
     this.bank = '';
@@ -52,16 +52,30 @@ export class InstallmentModalComponent {
 
   close() { this.modalService.closeInstallmentModal(); }
 
+  get paymentsPerMonth(): number {
+    if (this.frequency === 'weekly') return 4;
+    if (this.frequency === 'biweekly') return 2;
+    return 1;
+  }
+
+  get monthlyAmount(): number {
+    return (Number(this.amount) || 0) * this.paymentsPerMonth;
+  }
+
+  get paymentCount(): number {
+    return (Number(this.months) || 0) * this.paymentsPerMonth;
+  }
+
   get previewTotal(): number {
-    return (Number(this.amount) || 0) * (Number(this.totalCount) || 0);
+    return (Number(this.amount) || 0) * this.paymentCount;
   }
 
   save() {
-    if (!this.name.trim() || !this.amount || !this.totalCount || !this.startDate) return;
+    if (!this.name.trim() || !this.amount || !this.months || !this.startDate) return;
     this.api.createInstallment({
       name: this.name.trim(),
       amount: Number(this.amount),
-      total_count: Number(this.totalCount),
+      months: Number(this.months),
       frequency: this.frequency,
       start_date: this.startDate,
       bank: this.bank || null,
